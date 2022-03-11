@@ -50,11 +50,14 @@ def show_list(update: Update, context: CallbackContext) -> None:
     """Display shopping list when /list is issued."""
     global SHOPPING_LIST
     
-    formatted_list = '\n\- '.join(SHOPPING_LIST)
-    formatted_list = re.sub(r"([().-])", r"\\\1", formatted_list)
-    logger.info(formatted_list)
+    if len(SHOPPING_LIST) == 0:
+        update.message.reply_text('Shopping list is empty!')
+    else:
+        formatted_list = '\n- '.join(SHOPPING_LIST)
 
-    update.message.reply_markdown_v2(f'*Einkaufsliste:*\n\- {formatted_list}')
+        # escape especial characters to avoid markdown errors
+        formatted_list = re.sub(r"([().-])", r"\\\1", formatted_list)
+        update.message.reply_markdown_v2(f'*Shopping list:*\n\- {formatted_list}')
 
 
 def add(update: Update, context: CallbackContext) -> None:
@@ -65,18 +68,28 @@ def add(update: Update, context: CallbackContext) -> None:
     logger.info(item)
 
     SHOPPING_LIST.append(item)
-    update.message.reply_text(f'"{item}" in die Einkaufsliste eingetragen.')
+    update.message.reply_text(f'"{item}" added to shopping list.')
 
 
 def remove(update: Update, context: CallbackContext) -> None:
     """Display shopping list when /remove is issued."""
-    update.message.reply_text('Remove!')
+    global SHOPPING_LIST
+
+    item = ' '.join(context.args).strip()
+
+    for element in SHOPPING_LIST:
+        if item.lower() in element.lower():
+            SHOPPING_LIST.remove(element)
+            update.message.reply_text(f'"{item.capitalize()}" removed from shopping list.')
+            return
 
 
 def clear(update: Update, context: CallbackContext) -> None:
-    """Display shopping list when /clear is issued."""
-    update.message.reply_text('Are you sure?', reply_markup=ForceReply(selective=True))
-    update.message.reply_text('Clear!')
+    """Clear shopping list with /clear."""
+    # update.message.reply_text('Are you sure?', reply_markup=ForceReply(selective=True))
+    global SHOPPING_LIST
+    SHOPPING_LIST = list()
+    update.message.reply_text('List cleared!')
 
 
 def help(update: Update, context: CallbackContext) -> None:
@@ -109,9 +122,6 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("add", add))
     dispatcher.add_handler(CommandHandler("remove", remove))
     dispatcher.add_handler(CommandHandler("clear", clear))
-
-    # on non command i.e message - echo the message on Telegram
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
     # Start the Bot
     updater.start_polling()
