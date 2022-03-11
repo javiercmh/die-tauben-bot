@@ -1,16 +1,13 @@
-#!/usr/bin/env python
-# pylint: disable=C0116,W0613
-# This program is dedicated to the public domain under the CC0 license.
-
 """
-Simple Bot to reply to Telegram messages.
+Simple Telegram bot to manage a shopping list.
 
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
+List of commands:
+/list - Show products in the shopping list
+/add - Add product to the shopping list
+/remove - Remove a product from the shopping list
+/clear - Remove all products from the shopping list
+/undo - Undo last action
 
-Usage:
-Basic Echobot example, repeats messages.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
@@ -79,7 +76,7 @@ def add(update: Update, context: CallbackContext) -> None:
             SHOPPING_LIST.append(item)
             update.message.reply_text(f'"{item}" added to shopping list.')
         else:
-            update.message.reply_text('Please specify an item to add.')
+            update.message.reply_text('Please specify an item to add. For example: /add milk, eggs, bread')
 
 
 
@@ -99,7 +96,7 @@ def remove(update: Update, context: CallbackContext) -> None:
                 update.message.reply_text(f'"{element}" removed from shopping list.')
                 return
     else:
-        update.message.reply_text('Please specify an item to remove.')
+        update.message.reply_text('Please specify an item to remove. For example: /remove milk')
 
 def clear(update: Update, context: CallbackContext) -> None:
     """Clear shopping list with /clear."""
@@ -133,11 +130,6 @@ def help(update: Update, context: CallbackContext) -> None:
 /remove - Remove a product from the shopping list
 /clear - Remove all products from the shopping list'''
     update.message.reply_text(message)
-
-
-def echo(update: Update, context: CallbackContext) -> None:
-    """Echo the user message."""
-    update.message.reply_text(update.message.text)
 
 
 def main() -> None:

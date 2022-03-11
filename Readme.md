@@ -1,3 +1,3 @@
 # Die Tauben Bot
 
-Simple Telegram bot that keeps track of our WG shopping list.
+Simple Telegram bot to manage a shopping list.
