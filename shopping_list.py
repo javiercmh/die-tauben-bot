@@ -28,6 +28,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 SHOPPING_LIST = list()
+LIST_BACKUP = SHOPPING_LIST
 
 def get_token():
     """Get the bot token from file."""
@@ -40,10 +41,13 @@ def get_token():
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
-    update.message.reply_markdown_v2(
-        fr'Hi {user.mention_markdown_v2()}\!',
-        reply_markup=ForceReply(selective=True),
-    )
+    update.message.reply_markdown_v2(f'Hi {user.mention_markdown_v2()}\!')
+    update.message.reply_text('''List of commands:
+/list - Show products in the shopping list
+/add - Add product to the shopping list
+/remove - Remove a product from the shopping list
+/clear - Remove all products from the shopping list
+/undo - Undo last action''')
 
 
 def show_list(update: Update, context: CallbackContext) -> None:
@@ -64,6 +68,9 @@ def add(update: Update, context: CallbackContext) -> None:
     """Add item to shopping list with /add."""
     global SHOPPING_LIST
 
+    global LIST_BACKUP
+    LIST_BACKUP = SHOPPING_LIST.copy()
+
     items = ' '.join(context.args).strip().split(',')
 
     for item in items:
@@ -72,9 +79,13 @@ def add(update: Update, context: CallbackContext) -> None:
         update.message.reply_text(f'"{item}" added to shopping list.')
 
 
+
 def remove(update: Update, context: CallbackContext) -> None:
     """Display shopping list when /remove is issued."""
     global SHOPPING_LIST
+
+    global LIST_BACKUP
+    LIST_BACKUP = SHOPPING_LIST.copy()
 
     item = ' '.join(context.args).strip()
 
@@ -91,8 +102,24 @@ def clear(update: Update, context: CallbackContext) -> None:
     """Clear shopping list with /clear."""
     # update.message.reply_text('Are you sure?', reply_markup=ForceReply(selective=True))
     global SHOPPING_LIST
+
+    global LIST_BACKUP
+    LIST_BACKUP = SHOPPING_LIST
+
     SHOPPING_LIST = list()
     update.message.reply_text('List cleared!')
+
+
+def undo(update: Update, context: CallbackContext) -> None:
+    """Undo last action."""
+    global SHOPPING_LIST
+    global LIST_BACKUP
+    
+    # restore from backup
+    SHOPPING_LIST = LIST_BACKUP
+
+    update.message.reply_text('Shopping list restored.')
+    show_list(update, context)
 
 
 def help(update: Update, context: CallbackContext) -> None:
@@ -125,6 +152,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("add", add))
     dispatcher.add_handler(CommandHandler("remove", remove))
     dispatcher.add_handler(CommandHandler("clear", clear))
+    dispatcher.add_handler(CommandHandler("undo", undo))
 
     # Start the Bot
     updater.start_polling()
