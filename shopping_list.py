@@ -64,11 +64,12 @@ def add(update: Update, context: CallbackContext) -> None:
     """Add item to shopping list with /add."""
     global SHOPPING_LIST
 
-    item = ' '.join(context.args).strip().capitalize()
-    logger.info(item)
+    items = ' '.join(context.args).strip().split(',')
 
-    SHOPPING_LIST.append(item)
-    update.message.reply_text(f'"{item}" added to shopping list.')
+    for item in items:
+        item = item.strip().title()
+        SHOPPING_LIST.append(item)
+        update.message.reply_text(f'"{item}" added to shopping list.')
 
 
 def remove(update: Update, context: CallbackContext) -> None:
@@ -80,7 +81,7 @@ def remove(update: Update, context: CallbackContext) -> None:
     for element in SHOPPING_LIST:
         if item.lower() in element.lower():
             SHOPPING_LIST.remove(element)
-            update.message.reply_text(f'"{item.capitalize()}" removed from shopping list.')
+            update.message.reply_text(f'"{item.title()}" removed from shopping list.')
             return
 
 
