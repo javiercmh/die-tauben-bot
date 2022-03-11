@@ -74,9 +74,12 @@ def add(update: Update, context: CallbackContext) -> None:
     items = ' '.join(context.args).strip().split(',')
 
     for item in items:
-        item = item.strip().title()
-        SHOPPING_LIST.append(item)
-        update.message.reply_text(f'"{item}" added to shopping list.')
+        if len(item) > 0:
+            item = item.strip().title()
+            SHOPPING_LIST.append(item)
+            update.message.reply_text(f'"{item}" added to shopping list.')
+        else:
+            update.message.reply_text('Please specify an item to add.')
 
 
 
