@@ -79,11 +79,10 @@ def remove(update: Update, context: CallbackContext) -> None:
     item = ' '.join(context.args).strip()
 
     if len(item) > 0:
-
         for element in SHOPPING_LIST:
             if item.lower() in element.lower():
                 SHOPPING_LIST.remove(element)
-                update.message.reply_text(f'"{item.title()}" removed from shopping list.')
+                update.message.reply_text(f'"{element}" removed from shopping list.')
                 return
     else:
         update.message.reply_text('Please specify an item to remove.')
