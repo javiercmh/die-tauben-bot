@@ -61,7 +61,6 @@ def shutdown(sig, frame):
         pickle.dump(SHOPPING_LIST, backup)
     
     updater.stop()
-    exit(0)
 
 
 ### Command handlers
@@ -164,7 +163,8 @@ def help(update: Update, context: CallbackContext) -> None:
 
 
 def main() -> None:
-    """Start the bot."""
+    """Start the bot. Pressing Ctrl-C or receiving a SIGINT, SIGTERM 
+    or SIGABRT will trigger the shutdown function."""
     global updater
 
     restore_from_backup()
@@ -187,10 +187,6 @@ def main() -> None:
 
     # Start the Bot
     updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. We are handling Ctrl-C with signal.signal, so we comment this out.
-    # updater.idle()
 
 
 if __name__ == '__main__':
