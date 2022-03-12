@@ -14,6 +14,9 @@ bot.
 
 import logging
 import re
+import pickle
+import signal
+import sys
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -23,18 +26,46 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
+updater = None
 logger = logging.getLogger(__name__)
 SHOPPING_LIST = list()
 LIST_BACKUP = SHOPPING_LIST
 
-def get_token():
+
+def get_token() -> str:
     """Get the bot token from file."""
     with open('api.key') as f:
         return f.read().strip()
 
 
-# Define a few command handlers. These usually take the two arguments update and
-# context.
+def restore_from_backup() -> None:
+    """Retrieve shopping list from backup or start with an empty list."""
+    global SHOPPING_LIST
+
+    logger.info('Attempting to restore shopping list from backup...')
+    
+    try:
+        with open('shopping_list.pkl', 'rb') as backup:
+            SHOPPING_LIST = pickle.load(backup)
+    except FileNotFoundError:
+        pass
+
+def shutdown(sig, frame):
+    """Backup shopping list before shutdown."""
+    global SHOPPING_LIST
+    global updater
+
+    logger.info('Backing up shopping list before shutdown')
+
+    with open('shopping_list.pkl', 'wb') as backup:
+        pickle.dump(SHOPPING_LIST, backup)
+    
+    updater.stop()
+    exit(0)
+
+
+### Command handlers
+
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
@@ -134,6 +165,11 @@ def help(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     """Start the bot."""
+    global updater
+
+    restore_from_backup()
+    signal.signal(signal.SIGINT, shutdown)
+
     # Create the Updater and pass it your bot's token.
     updater = Updater(get_token())
 
@@ -153,9 +189,8 @@ def main() -> None:
     updater.start_polling()
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # SIGTERM or SIGABRT. We are handling Ctrl-C with signal.signal, so we comment this out.
+    # updater.idle()
 
 
 if __name__ == '__main__':
