@@ -2,3 +2,4 @@ venv/
 api.key
 echobot.py
 *.pkl
+__pycache__
