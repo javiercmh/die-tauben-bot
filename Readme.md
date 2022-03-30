@@ -19,6 +19,6 @@ Then you need to install the following library:
 
     $ pip install python-telegram-bot --upgrade
 
-Finally, put your API key in a file called `api.key`.
+Finally, add the API key as a envirnoment variable "TELEGRAM_API_KEY".
 
 You are ready to run the Python file.

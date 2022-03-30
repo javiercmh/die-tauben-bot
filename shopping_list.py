@@ -16,7 +16,8 @@ import logging
 import re
 import pickle
 import signal
-import sys
+import os
+from xml.dom.minidom import Attr
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -171,7 +172,11 @@ def main() -> None:
     signal.signal(signal.SIGINT, shutdown)
 
     # Create the Updater and pass it your bot's token.
-    updater = Updater(get_token())
+    try:
+        updater = Updater(os.environ.get('TELEGRAM_API_KEY'))
+    except ValueError:
+        logger.error('No Telegram API key found!')
+        return
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
