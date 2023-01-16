@@ -17,10 +17,9 @@ import re
 import pickle
 import signal
 import os
-from xml.dom.minidom import Attr
 
 from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -33,7 +32,7 @@ SHOPPING_LIST = list()
 LIST_BACKUP = SHOPPING_LIST
 
 
-def get_token() -> str:
+def get_api_key() -> str:
     """Get the bot token from file."""
     with open('api.key') as f:
         return f.read().strip()
@@ -173,7 +172,7 @@ def main() -> None:
 
     # Create the Updater and pass it your bot's token.
     try:
-        updater = Updater(os.environ.get('TELEGRAM_API_KEY'))
+        updater = Updater(get_api_key())
     except ValueError:
         logger.error('No Telegram API key found!')
         return

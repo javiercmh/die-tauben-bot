@@ -1,1 +1,0 @@
-web: python3 shopping_list.py

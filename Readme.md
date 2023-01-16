@@ -14,11 +14,10 @@ bot.
 
 ## Installing
 
-First I recommend creating a virtual environment.
-Then you need to install the following library:
+Create a virtual environment and install the requirements.
 
-    $ pip install python-telegram-bot --upgrade
+    $ pip install -r requirements.txt
 
-Finally, add the API key as a envirnoment variable "TELEGRAM_API_KEY".
+Finally, paste the API key in `api.key`.
 
-You are ready to run the Python file.
+Run `run_bot.sh`.
