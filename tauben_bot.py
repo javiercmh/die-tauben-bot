@@ -16,7 +16,6 @@ import logging
 import re
 import pickle
 import signal
-import os
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, CallbackContext
